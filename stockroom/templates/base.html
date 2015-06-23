@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        {% get_static_prefix as STATIC_URL %}
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+        <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+        <script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+        <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap-theme.min.css' %}">
+
+        <link rel="stylesheet" href="{% static "style.css" %}">
+
+        <style type="text/css">
+            table {
+               font-size: 14px !important;
+            }
+        </style>
+
+        <title>Stock Room</title>
+
+        {% block head %}  {% endblock %}
+    </head>
+
+<body>
+
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="{% url 'grid' %}" class="btn navbar-btn btn-danger" role="button">Stock Room</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+            <ul class="nav navbar-nav">
+                <li><a href="{% url 'about' %}"><span class="glyphicon glyphicon-tag"></span>
+                    About</a></li>
+            </ul>
+
+            {% if user.is_authenticated %}
+                <div class="navbar-form navbar-right btn-group">
+                    <a href="{% url 'admin:index' %}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-wrench"></span>Admin</a>
+                    <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-user"></span> User '{{ user.username }}' is authenticated.</button>
+{#                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-log-in"></span> Logout</button>#}
+                    <a href="{% url 'logout' %}" class="btn btn-default" role="button"><span class="glyphicon glyphicon-log-in"></span> Logout</a>
+                </div>
+            {% else %}
+                <form name='AuthenticationForm' method="post" action="{% url 'login' %}" class="navbar-form navbar-right" role="form" >
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="sr-only" for="exampleInputUsername2">Login</label>
+                        <input type="text" class="form-control" id="exampleInputUsername2" placeholder="Username" name="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="sr-only" for="exampleInputPassword2">Password</label>
+                        <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Password" name="password">
+                    </div>
+
+                    <button type="submit" class="btn btn-default">
+                        <span class="glyphicon glyphicon-log-in"></span>
+                        <i class="icon-user icon-white"></i> Log in
+                    </button>
+                </form>
+            {% endif %}
+
+        </div>
+    </div>
+</nav>
+
+{% if messages %}
+    <div class="container-fluid">
+        <ul class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert"> {{ message }} </div>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+{% block table %}  {% endblock %}
+
+</body>
+
+</html>
+

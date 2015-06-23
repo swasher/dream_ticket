@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block table %}
+
+{% load admin_urls %}
+{% load static %}
+
+<div class="container-fluid">
+    <table class="table table-striped table-hover table-bordered table-condensed">
+            <tr>
+                <th>Name</th>
+                <th class="col-md-3">Description</th>
+                <th>Price</th>
+                <th>Created</th>
+                <th>Modified</th>
+                <th>Slug line</th>
+                <th>Likes</th>
+                <th>Edit</th>
+            </tr>
+        {% for product in products %}
+            <tr>
+                <td><a href="{% url 'product' product.slug %}">{{ product.name }}</a></td>
+                <td><h6>{{ product.description }}</h6></td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.created_at }}</td>
+                <td>{{ product.modified_at }}</td>
+                <td>{{ product.slug }}</td>
+                <td>{{ product.like_set.count }}</td>
+                <td>
+                    <a type="button" class="btn-sm btn-info" href="{% url 'admin:stockroom_product_change' product.pk %}">
+                        <span class="glyphicon glyphicon-edit"></span></a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </table>
+
+    {% comment %}<nav>
+        <ul class="pager">
+            {% if products.has_previous %}
+                <li><a href="?page={{ products.previous_page_number }}">previous</a></li>
+            {% endif %}
+            <li>
+                <span class="current">
+                    {{ products.number }} of {{ products.paginator.num_pages }}
+                </span>
+            </li>
+            {% if products.has_next %}
+                <li><a href="?page={{ products.next_page_number }}">next</a></li>
+            {% endif %}
+      </ul>
+    </nav>
+{% endcomment %}
+
+    <nav>
+        <ul class="pager">
+            {% if products.has_previous %}
+                <li class="previous"><a href="?page={{ products.previous_page_number }}">previous</a></li>
+            {% else %}
+                <li class="previous disabled"><a href="">previous</a></li>
+            {% endif %}
+            <li>
+                <span class="current">
+                    {{ products.number }} of {{ products.paginator.num_pages }}
+                </span>
+            </li>
+            {% if products.has_next %}
+                <li class="next"><a href="?page={{ products.next_page_number }}">next</a></li>
+            {% else %}
+                <li class="next disabled"><a href="">next</a></li>
+            {% endif %}
+      </ul>
+    </nav>
+
+
+
+</div>
+
+
+{% endblock %}
