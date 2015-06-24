@@ -1,7 +1,7 @@
 # coding: utf-8
 from django.db import models
 from django.utils.text import slugify
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 
 
@@ -39,3 +39,18 @@ class Comment(models.Model):
     user = models.ForeignKey(User)
     product = models.ForeignKey(Product)
     contents = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True, editable=False, blank=True, null=True, verbose_name='Comment creation date')
+
+    @property
+    def within_24h(self):
+        if (datetime.now() - self.created_at) < timedelta(days=1):
+            return True
+        else:
+            return False
+
+    def __unicode__(self):
+        try:
+            create_time = self.created_at.strftime("%d %B %Y, %H:%M")
+        except AttributeError:
+            create_time = None
+        return 'Comment from {} at {}'.format(self.user.username, create_time)

@@ -8,13 +8,13 @@
 <div class="container-fluid">
     <table class="table table-striped table-hover table-bordered table-condensed">
             <tr>
-                <th>Name</th>
+                <th><a href="?order_by=name">Name</a></th>
                 <th class="col-md-3">Description</th>
-                <th>Price</th>
+                <th><a href="?order_by=price">Price</a></th>
                 <th>Created</th>
                 <th>Modified</th>
                 <th>Slug line</th>
-                <th>Likes</th>
+                <th><a href="?order_by=like">Likes</a></th>
                 <th>Edit</th>
             </tr>
         {% for product in products %}
@@ -34,23 +34,6 @@
         {% endfor %}
 
     </table>
-
-    {% comment %}<nav>
-        <ul class="pager">
-            {% if products.has_previous %}
-                <li><a href="?page={{ products.previous_page_number }}">previous</a></li>
-            {% endif %}
-            <li>
-                <span class="current">
-                    {{ products.number }} of {{ products.paginator.num_pages }}
-                </span>
-            </li>
-            {% if products.has_next %}
-                <li><a href="?page={{ products.next_page_number }}">next</a></li>
-            {% endif %}
-      </ul>
-    </nav>
-{% endcomment %}
 
     <nav>
         <ul class="pager">
