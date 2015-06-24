@@ -1,5 +1,6 @@
 # coding: utf-8
-from django.shortcuts import render, redirect, render_to_response, RequestContext, Http404, HttpResponseRedirect
+from django.db.models import Count
+from django.shortcuts import redirect, render_to_response, RequestContext, Http404, HttpResponseRedirect
 from django.contrib.auth import login as django_login, authenticate, logout as django_logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -43,20 +44,28 @@ def login_redirect(request):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-# def grid(request):
-#     context_instance = RequestContext(request)
-#     products = Product.objects.all()
-#     return render_to_response('grid.html', {'products': products}, context_instance)
-
-
 def grid(request):
     context_instance = RequestContext(request)
 
-    product_list = Product.objects.all()
+    # for security reasons we limit acceptable 'order_by'
+    VALID_SORTS = {
+        "name": "name",
+        "price": "price",
+        "likes": "-likes",   # set descent sort
+    }
+    DEFAULT_SORT = 'name'
 
-    # setup pagination for 3 item per page
-    paginator = Paginator(product_list, 3)
-    page = request.GET.get('page')
+
+    # Choose ordering column and pagination page
+    page = request.GET.get('page', 1)
+    get_order_by = request.GET.get('order_by', DEFAULT_SORT)
+    order_by = VALID_SORTS.get(get_order_by, DEFAULT_SORT)
+
+    # Count like using 'annotate' feature. Then count of likes will be accessible via product_list.likes
+    product_list = Product.objects.all().annotate(likes=Count('like')).order_by(order_by)
+
+    # setup pagination for 4 item per page
+    paginator = Paginator(product_list, 4)
 
     try:
         products = paginator.page(page)
@@ -67,24 +76,7 @@ def grid(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         products = paginator.page(paginator.num_pages)
 
-    # Choose ordering column
-    order_by = request.GET.get('order_by', 'name')
-
-    import sys
-    TTY = '/dev/tty1'
-    sys.stdout = open(TTY, 'w')
-    print order_by
-    print products.object_list
-
-    #sorted_product = sorted(products.object_list, key=lambda k: k['name'])
-    #sorted_product = sorted(products.object_list)
-    #sorted_product = products.object_list.order_by('price')
-
-    #import operator
-    #sorted_product = sorted(products, key=operator.attrgetter(order_by))
-
-    return render_to_response('grid.html', {'products': products}, context_instance)
-
+    return render_to_response('grid.html', {'products': products, 'order_by': order_by}, context_instance)
 
 
 def product(request, slug):
@@ -129,7 +121,7 @@ def product(request, slug):
     else:
         form = CommentForm()
 
-    # Count likes for current 'pruduct'. Count of records with our 'product' will match count of likes.
+    # Show users, who like this product
     likes = Like.objects.filter(product=product)
 
     # We show comment on product page
