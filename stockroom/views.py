@@ -51,17 +51,16 @@ def grid(request):
     VALID_SORTS = {
         "name": "name",
         "price": "price",
-        "likes": "-likes",   # set descent sort
+        "-likes": "-likes",   # we want descent sort
     }
     DEFAULT_SORT = 'name'
-
 
     # Choose ordering column and pagination page
     page = request.GET.get('page', 1)
     get_order_by = request.GET.get('order_by', DEFAULT_SORT)
     order_by = VALID_SORTS.get(get_order_by, DEFAULT_SORT)
 
-    # Count like using 'annotate' feature. Then count of likes will be accessible via product_list.likes
+    # Count likes using 'annotate' feature. Then likes number will be accessible via product_list.likes
     product_list = Product.objects.all().annotate(likes=Count('like')).order_by(order_by)
 
     # setup pagination for 4 item per page
